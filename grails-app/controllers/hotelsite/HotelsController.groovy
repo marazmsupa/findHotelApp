@@ -99,7 +99,7 @@ class HotelsController {
 
         if (hotels.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond hotels.errors, view:'create'
+            respond hotels.errors, view:'edit'
             return
         }
 

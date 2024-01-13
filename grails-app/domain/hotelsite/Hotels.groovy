@@ -6,7 +6,6 @@ class Hotels {
     Integer stars
     String site
 
-    static belongsTo = Countries
 
     static constraints = {
         name maxSize: 255, unique: true, blank: false
