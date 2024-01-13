@@ -1,0 +1,11 @@
+:root {
+  --main_color: #fafafa;
+  --bordered_elements_color: #fff;
+  --secondary_color: #4788ff;
+  --alt_secondary_color: #f4ba4a;
+  --footer_color: #1b1a1a;
+  --text_main_color: #3f3e3e;
+  --text_second_color: #ffffff;
+  --text_table_header_color: #9c9c9c;
+  --forms_fields_backgroung_color: #f3f2f2;
+}
