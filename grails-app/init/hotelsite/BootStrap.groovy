@@ -2,8 +2,8 @@ package hotelsite
 
 class BootStrap {
 
-    HotelsService hotelsService;
-    CountriesService countriesService;
+    HotelsService hotelsService
+    CountriesService countriesService
     def init = { servletContext ->
         Countries countryRussia = countriesService.save('Россия', 'Москва')
         Countries countryBritain = countriesService.save('Великобритания', 'Лондон')
@@ -16,6 +16,7 @@ class BootStrap {
         Countries countryMonaco = countriesService.save('Монако', 'Монако')
         Countries countryAustria = countriesService.save('Австрия', 'Вена')
         Countries countrySwitzerland = countriesService.save('Швейцария', 'Берн')
+
         hotelsService.save('Россия', countryRussia, 5, 'https://rossiya-hotel.ru/')
         hotelsService.save('Золотая Гавань', countryRussia, 4, null)
         hotelsService.save('Городские Облака', countryRussia, 3, null)

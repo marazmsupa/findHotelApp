@@ -10,6 +10,6 @@ class Hotels {
     static constraints = {
         name maxSize: 255, unique: true, blank: false
         stars range: 1..5
-        site nullable: true
+        site nullable: true, matches: '^(http://|https://).+$'
     }
 }

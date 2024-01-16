@@ -2,70 +2,37 @@ package hotelsite
 
 import grails.gorm.transactions.Transactional
 
-import static org.springframework.http.HttpStatus.CREATED
 
 class HotelsController {
 
     static allowedMethods = [save: 'POST', update: 'PUT', delete: 'DELETE']
 
+    def hotelsListService
+    def countriesListService
+    def paginationCountService
+
     def index(){
-        redirect action: 'list';
+        redirect action: 'list'
     }
 
     def list(String offset){
-        Integer offsetInteger = 0
-        if(offset != null && offset != null){
-            try {
-                offsetInteger = Integer.parseInt(offset)
-            }
-            catch (NumberFormatException ex){
+        def hotelsListCount = hotelsListService.getHotelsListCount(hotelsListService.getHotelsListSorted(null, null))
 
-            }
-        }
-
-        def hotelsCriteria = Hotels.createCriteria()
-
-
-
-        def hotelsList = hotelsCriteria.list {
-            order("stars", "desc")
-            order("name", "asc")
-        };
-        def hotelsListCount
-        if(hotelsList == null){
-            hotelsListCount = 0
-        }
-        else{
-            hotelsListCount = hotelsList.size()
-        }
-
-        Integer paginationCount = (hotelsListCount - 1) / 10;
-
-        def hotelsCriteriaNew = Hotels.createCriteria()
-
-        hotelsList = hotelsCriteriaNew.list(max: 10, offset: offsetInteger) {
-            order("stars", "desc")
-            order("name", "asc")
-        };
-
-        respond([hotelsList: hotelsList, hotelsListCount: hotelsListCount, paginationCount: paginationCount])
+        respond([hotelsList: hotelsListService.getHotelsListSortedWithOffset(offset, null, null),
+                 hotelsListCount: hotelsListCount,
+                 paginationCount: paginationCountService.getPaginationCount(hotelsListCount)
+        ])
     }
 
     def view(String name){
-        Hotels hotel = null;
-        if (name != null && name != ""){
-            def hotelsCriteria = Hotels.createCriteria()
-            hotel = hotelsCriteria.get {
-                eq('name', name)
-            };
-
-        }
-        respond([hotel: hotel])
+        respond([hotel: hotelsListService.getHotelByName(name)])
     }
 
     @SuppressWarnings(['FactoryMethodName', 'GrailsMassAssignment'])
     def create() {
-        respond([hotels: new Hotels(params), countriesList:Countries.list()])
+        def countriesList = countriesListService.getCountriesList(null)
+
+        respond([hotels: new Hotels(), countriesList:countriesList, countriesCount:countriesListService.getCountriesListCount(countriesList)])
     }
 
     @Transactional
@@ -77,7 +44,7 @@ class HotelsController {
 
         if (hotels.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond hotels.errors, view:'create'
+            respond([countriesList:countriesListService.getCountriesList(null), errors:hotels.errors], view:'create')
             return
         }
 
@@ -87,7 +54,7 @@ class HotelsController {
     }
 
     def edit(Hotels hotels){
-      respond([hotels: hotels, countriesList:Countries.list()])
+      respond([hotels: hotels, countriesList:countriesListService.getCountriesList(null)])
     }
 
     @Transactional
@@ -99,7 +66,7 @@ class HotelsController {
 
         if (hotels.hasErrors()) {
             transactionStatus.setRollbackOnly()
-            respond hotels.errors, view:'edit'
+            respond([countriesList:countriesListService.getCountriesList(null), errors:hotels.errors, hotels: hotels], view:'edit')
             return
         }
 
@@ -110,13 +77,8 @@ class HotelsController {
 
     @Transactional
     def drop(String name){
-        Hotels hotel = null;
-        if (name != null && name != ""){
-            def hotelsCriteria = Hotels.createCriteria()
-            hotel = hotelsCriteria.get {
-                eq('name', name)
-            };
-        }
+        Hotels hotel = hotelsListService.getHotelByName(name)
+
         if(hotel == null){
             redirect action: 'list'
             transactionStatus.setRollbackOnly()
